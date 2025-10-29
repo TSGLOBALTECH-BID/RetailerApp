@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">RetailerApp</string>
+    
+    <!-- Sign Up Screen -->
+    <string name="create_account">Create Account</string>
+    <string name="full_name">Full Name</string>
+    <string name="enter_your_name">Enter your name</string>
+    <string name="email">Email</string>
+    <string name="enter_your_email">Enter your email</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="enter_your_phone">Enter your phone number</string>
+    <string name="password">Password</string>
+    <string name="enter_password">Enter your password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="confirm_your_password">Confirm your password</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="already_have_an_account_login">Already have an account? Log In</string>
+    <string name="or_sign_up_with">Or sign up with</string>
+    <string name="create_an_account">Create an Account</string>
+    <string name="log_in">Log In</string>
 </resources>
