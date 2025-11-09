@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit
 object ApiClient {
     private const val BASE_URL = "https://your-api-base-url.com/" // Replace with your API base URL
     private var retrofit: Retrofit? = null
-    private var apiService: ApiService? = null
 
     // Create OkHttpClient with logging interceptor
     private val httpClient: OkHttpClient by lazy {
@@ -41,13 +40,10 @@ object ApiClient {
         }
     }
 
-    // Get API service instance
-    val apiService: ApiService
-        get() {
-            return apiService ?: synchronized(this) {
-                getRetrofitInstance().create(ApiService::class.java).also { apiService = it }
-            }
-        }
+    // API service instance with lazy initialization
+    val apiService: ApiService by lazy {
+        getRetrofitInstance().create(ApiService::class.java)
+    }
 
     /**
      * Handles API calls and wraps the response in ApiResponse

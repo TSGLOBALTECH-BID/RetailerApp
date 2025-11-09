@@ -2,6 +2,7 @@ package com.lolakashmir.retailerapp.data.repository
 
 import com.lolakashmir.retailerapp.data.api.ApiClient
 import com.lolakashmir.retailerapp.data.model.ApiResponse
+import com.lolakashmir.retailerapp.data.model.BaseResponse
 import retrofit2.Response
 
 /**
@@ -41,7 +42,7 @@ class ApiRepository {
     /**
      * Example function to delete data
      */
-    suspend fun deleteData(id: String): ApiResponse<Unit> {
+    suspend fun deleteData(id: String): ApiResponse<BaseResponse<Unit>> {
         return ApiClient.safeApiCall {
             apiService.deleteData(id)
         }
