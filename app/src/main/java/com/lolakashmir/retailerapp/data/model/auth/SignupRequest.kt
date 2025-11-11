@@ -1,5 +1,5 @@
-// data/model/SignupRequest.kt
-package com.lolakashmir.retailerapp.data.model
+// data/model/auth/SignupRequest.kt
+package com.lolakashmir.retailerapp.data.model.auth
 
 data class SignupRequest(
     val name: String,

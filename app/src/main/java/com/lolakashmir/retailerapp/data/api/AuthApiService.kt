@@ -1,7 +1,7 @@
 // data/api/AuthApiService.kt
 package com.lolakashmir.retailerapp.data.api
 
-import com.lolakashmir.retailerapp.data.model.SignupRequest
+import com.lolakashmir.retailerapp.data.model.auth.SignupRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

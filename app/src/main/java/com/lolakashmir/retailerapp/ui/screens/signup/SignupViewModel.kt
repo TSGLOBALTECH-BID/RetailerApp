@@ -6,6 +6,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lolakashmir.retailerapp.R
+import com.lolakashmir.retailerapp.data.model.ApiResponse
+import com.lolakashmir.retailerapp.data.model.auth.SignupRequest
+import com.lolakashmir.retailerapp.data.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +27,9 @@ sealed class SignupUiState {
 /**
  * ViewModel for handling signup logic and managing UI state
  */
-class SignupViewModel : ViewModel() {
+class SignupViewModel(
+    private val authRepository: AuthRepository = AuthRepository()
+) : ViewModel() {
     // Form fields
     var name by mutableStateOf("")
         private set
@@ -125,23 +130,28 @@ class SignupViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // TODO: Replace with actual signup API call
-                // Example:
-                // val result = authRepository.signUp(name, email, phone, password)
-                // if (result.isSuccess) {
-                //     _uiState.value = SignupUiState.Success
-                //     onSuccess()
-                // } else {
-                //     _uiState.value = SignupUiState.Error(result.errorMessage ?: "Signup failed")
-                //     onError(result.errorMessage ?: "Signup failed")
-                // }
+                val signupRequest = SignupRequest(
+                    name = name,
+                    email = email,
+                    phone = phone,
+                    password = password,
+                    password_confirmation = confirmPassword
+                )
                 
-                // Simulate network delay
-                kotlinx.coroutines.delay(1500)
-                
-                // For now, just simulate a successful signup
-                _uiState.value = SignupUiState.Success
-                onSuccess()
+                when (val result = authRepository.singnUp(signupRequest)) {
+                    is ApiResponse.Success -> {
+                        _uiState.value = SignupUiState.Success
+                        onSuccess()
+                    }
+                    is ApiResponse.Error -> {
+                        _uiState.value = SignupUiState.Error(result.message)
+                        onError(result.message)
+                    }
+                    else -> {
+                        _uiState.value = SignupUiState.Error("Unexpected response from server")
+                        onError("Unexpected response from server")
+                    }
+                }
             } catch (e: Exception) {
                 _uiState.value = SignupUiState.Error(e.message ?: "An unknown error occurred")
                 onError(e.message ?: "An unknown error occurred")

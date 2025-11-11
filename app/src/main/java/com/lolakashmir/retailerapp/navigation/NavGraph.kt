@@ -32,10 +32,10 @@ fun NavGraph(
         
         composable(Screen.SignUp.route) {
             SignupScreen(
-                onSignUpClick = { name, email, phone, password ->
-                    // Handle sign up logic here
-                    navController.popBackStack()
-                },
+//                onSignUpClick = { name, email, phone, password ->
+//                    // Handle sign up logic here
+//                    navController.popBackStack()
+//                },
                 onLoginClick = {
                     navController.popBackStack()
                 }
