@@ -131,7 +131,8 @@ class SignupViewModel(
         viewModelScope.launch {
             try {
                 val signupRequest = SignupRequest(
-                    name = name,
+                    fullName = name,
+                    username = name.substring(range = 1..3),
                     email = email,
                     phone = phone,
                     password = password,

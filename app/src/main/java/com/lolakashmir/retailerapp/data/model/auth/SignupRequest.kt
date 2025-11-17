@@ -2,7 +2,8 @@
 package com.lolakashmir.retailerapp.data.model.auth
 
 data class SignupRequest(
-    val name: String,
+    val fullName: String,
+    val username: String,
     val email: String,
     val phone: String,
     val password: String,

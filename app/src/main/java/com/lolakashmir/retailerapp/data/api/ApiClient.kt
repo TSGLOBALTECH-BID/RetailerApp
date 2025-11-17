@@ -10,7 +10,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
 
 object ApiClient {
-    private const val BASE_URL = "http://10.0.2.2:3000/api/" // "https://ecommerce-api-one-gamma.vercel.app/api/" // Replace with your API base URL
+    private const val BASE_URL = "http://10.0.2.2:3000/api/" //"https://ecommerce-api-one-gamma.vercel.app/api/" // Replace with your API base URL
     private var retrofit: Retrofit? = null
 
     // Create OkHttpClient with logging interceptor

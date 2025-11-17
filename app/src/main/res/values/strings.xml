@@ -19,4 +19,5 @@
     <string name="or_sign_up_with">Or sign up with</string>
     <string name="create_an_account">Create an Account</string>
     <string name="log_in">Log In</string>
+    <string name="sign_up_successful">Sign up successful</string>
 </resources>

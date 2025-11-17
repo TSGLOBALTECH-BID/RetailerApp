@@ -67,6 +67,10 @@ fun SignupScreen(
                 )
             }
             is SignupUiState.Success -> {
+                snackbarHostState.showSnackbar(
+                    message = "Sign up successful",
+                    withDismissAction = true
+                )
                 onSignUpSuccess()
             }
             else -> { /* Do nothing */ }
@@ -261,9 +265,9 @@ fun SignupScreen(
 private fun SignupScreenPreview() {
     RetailerAppTheme(darkTheme = false, dynamicColor = false) {
         Surface {
-            val viewModel = SignupViewModel()
+            // Using hiltViewModel() will automatically provide a ViewModel for preview
+            // No need to pass the ViewModel parameter as it has a default value
             SignupScreen(
-                viewModel = viewModel,
                 onSignUpSuccess = {},
                 onLoginClick = {}
             )
