@@ -9,6 +9,9 @@ import retrofit2.http.POST
 interface AuthApiService {
     @POST("auth/signup") // Replace with your actual signup endpoint
     suspend fun signUp(@Body signupRequest: SignupRequest): Response<SignupResponse>
+
+    @POST("auth/login") // Replace with your actual signup endpoint
+    suspend fun login(@Body email: String, password: String): Response<SignupResponse>
 }
 
 data class SignupResponse(

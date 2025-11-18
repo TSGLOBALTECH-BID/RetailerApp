@@ -20,12 +20,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
@@ -75,117 +76,76 @@ fun AppInput(
     isPasswordField: Boolean = false
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
-    
-    val backgroundColor = when (variant) {
-        InputVariant.Filled -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        InputVariant.Outlined -> Color.Transparent
-    }
-    
-    val textColor = MaterialTheme.colorScheme.onSurface
-    val placeholderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-    val disabledColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-    val errorColor = MaterialTheme.colorScheme.error
-    val focusedColor = MaterialTheme.colorScheme.primary
-    val unfocusedColor = MaterialTheme.colorScheme.outline
-    
-    val containerModifier = when (variant) {
-        InputVariant.Filled -> Modifier
-            .background(backgroundColor, RoundedCornerShape(8.dp))
-            .then(if (isError) Modifier.border(1.dp, errorColor, RoundedCornerShape(8.dp)) else Modifier)
-        InputVariant.Outlined -> Modifier
-            .border(
-                width = 1.dp,
-                color = when {
-                    isError -> errorColor
-                    else -> unfocusedColor
-                },
-                shape = RoundedCornerShape(8.dp)
-            )
-    }
-    
-    Column(
-        modifier = modifier
-    ) {
-        Box(
-            modifier = containerModifier
-        ) {
-            OutlinedTextField(
-                value = value,
-                onValueChange = onValueChange,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(0.dp),
-                label = label?.let { 
-                    { Text(text = it, style = MaterialTheme.typography.bodyMedium) } 
-                },
-                placeholder = placeholder?.let { 
-                    { Text(text = it, style = MaterialTheme.typography.bodyMedium.copy(color = placeholderColor)) } 
-                },
-                singleLine = singleLine,
-                maxLines = maxLines,
-                isError = isError,
-                leadingIcon = leadingIcon,
-                trailingIcon = {
-                    if (isPasswordField) {
-                        val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                        val description = if (passwordVisible) "Hide password" else "Show password"
-                        
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(imageVector = image, description)
-                        }
-                    } else {
-                        trailingIcon?.invoke()
+
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = MaterialTheme.colorScheme.primary,
+    unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+    errorBorderColor = MaterialTheme.colorScheme.error,
+    focusedLabelColor = MaterialTheme.colorScheme.primary,
+    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    errorLabelColor = MaterialTheme.colorScheme.error,
+    cursorColor = MaterialTheme.colorScheme.primary,
+    errorCursorColor = MaterialTheme.colorScheme.error,
+    focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
+    unfocusedLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    errorLeadingIconColor = MaterialTheme.colorScheme.error,
+    focusedTrailingIconColor = MaterialTheme.colorScheme.primary,
+    unfocusedTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    errorTrailingIconColor = MaterialTheme.colorScheme.error,
+    focusedContainerColor = MaterialTheme.colorScheme.surface,
+    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+    errorContainerColor = MaterialTheme.colorScheme.surface,
+    disabledContainerColor = MaterialTheme.colorScheme.surface,
+    focusedTextColor = MaterialTheme.colorScheme.onSurface,
+    unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+    errorTextColor = MaterialTheme.colorScheme.error,
+    disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+//    placeholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+    errorPlaceholderColor = MaterialTheme.colorScheme.error.copy(alpha = 0.6f)
+)
+
+    Column(modifier = modifier) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth(),
+            label = label?.let { { Text(it) } },
+            placeholder = placeholder?.let { { Text(it) } },
+            singleLine = singleLine,
+            maxLines = maxLines,
+            isError = isError,
+            leadingIcon = leadingIcon,
+            trailingIcon = {
+                if (isPasswordField) {
+                    val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                    val description = if (passwordVisible) "Hide password" else "Show password"
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(image, contentDescription = description)
                     }
-                },
-                visualTransformation = if (isPasswordField && !passwordVisible) {
-                    PasswordVisualTransformation()
                 } else {
-                    VisualTransformation.None
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = keyboardType,
-                    imeAction = imeAction
-                ),
-                keyboardActions = keyboardActions,
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = textColor,
-                    unfocusedTextColor = textColor,
-                    disabledTextColor = disabledColor,
-                    errorTextColor = errorColor,
-                    focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent,
-                    disabledContainerColor = Color.Transparent,
-                    errorContainerColor = Color.Transparent,
-                    cursorColor = focusedColor,
-                    errorCursorColor = errorColor,
-                    focusedLabelColor = focusedColor,
-                    unfocusedLabelColor = unfocusedColor,
-                    errorLabelColor = errorColor,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
-                    errorIndicatorColor = Color.Transparent,
-                    focusedLeadingIconColor = focusedColor,
-                    unfocusedLeadingIconColor = unfocusedColor,
-                    errorLeadingIconColor = errorColor,
-                    focusedTrailingIconColor = focusedColor,
-                    unfocusedTrailingIconColor = unfocusedColor,
-                    errorTrailingIconColor = errorColor,
-                    focusedPlaceholderColor = placeholderColor,
-                    unfocusedPlaceholderColor = placeholderColor,
-                    disabledPlaceholderColor = placeholderColor,
-                    errorPlaceholderColor = errorColor.copy(alpha = 0.6f)
-                )
-            )
-        }
-        
+                    trailingIcon?.invoke()
+                }
+            },
+            visualTransformation = if (isPasswordField && !passwordVisible) {
+                PasswordVisualTransformation()
+            } else {
+                VisualTransformation.None
+            },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = keyboardType,
+                imeAction = imeAction
+            ),
+            keyboardActions = keyboardActions,
+            colors = textFieldColors,
+            shape = RoundedCornerShape(12.dp)
+        )
+
         if (isError && !errorMessage.isNullOrEmpty()) {
-            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = errorMessage,
-                color = errorColor,
+                color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.padding(start = 12.dp)
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
             )
         }
     }

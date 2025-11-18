@@ -16,33 +16,25 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lolakashmir.retailerapp.R
 import com.lolakashmir.retailerapp.ui.components.AppButton
 import com.lolakashmir.retailerapp.ui.components.AppInput
 import com.lolakashmir.retailerapp.ui.components.ButtonVariant
-import com.lolakashmir.retailerapp.ui.theme.RetailerAppTheme
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -127,7 +119,7 @@ fun SignupScreen(
                 // Name Field
                 AppInput(
                     value = viewModel.name,
-                    onValueChange = { viewModel.updateName(it) },
+                    onValueChange = { viewModel.onNameChange(it) },
                     label = stringResource(R.string.full_name),
                     placeholder = stringResource(R.string.enter_your_name),
                     modifier = Modifier.fillMaxWidth()
@@ -136,7 +128,7 @@ fun SignupScreen(
                 // Email Field
                 AppInput(
                     value = viewModel.email,
-                    onValueChange = { viewModel.updateEmail(it) },
+                    onValueChange = { viewModel.onEmailChange(it) },
                     label = stringResource(R.string.email),
                     placeholder = stringResource(R.string.enter_your_email),
                     keyboardType = KeyboardType.Email,
@@ -147,7 +139,7 @@ fun SignupScreen(
                 // Phone Field
                 AppInput(
                     value = viewModel.phone,
-                    onValueChange = { viewModel.updatePhone(it) },
+                    onValueChange = { viewModel.onPhoneChange(it) },
                     label = stringResource(R.string.phone_number),
                     placeholder = stringResource(R.string.enter_your_phone),
                     keyboardType = KeyboardType.Phone,
@@ -158,7 +150,7 @@ fun SignupScreen(
                 // Password Field
                 AppInput(
                     value = viewModel.password,
-                    onValueChange = { viewModel.updatePassword(it) },
+                    onValueChange = { viewModel.onPasswordChange(it) },
                     label = stringResource(R.string.password),
                     placeholder = stringResource(R.string.enter_password),
                     isPasswordField = !viewModel.passwordVisible,
@@ -185,10 +177,10 @@ fun SignupScreen(
                 // Confirm Password Field
                 AppInput(
                     value = viewModel.confirmPassword,
-                    onValueChange = { viewModel.updateConfirmPassword(it) },
+                    onValueChange = { viewModel.onConfirmPasswordChange(it) },
                     label = stringResource(R.string.confirm_password),
                     placeholder = stringResource(R.string.confirm_your_password),
-                    isPasswordField = !viewModel.confirmPasswordVisible,
+                    isPasswordField = !viewModel.passwordVisible,
                     isError = viewModel.confirmPassword.isNotBlank() &&
                             viewModel.password != viewModel.confirmPassword,
                     errorMessage = if (viewModel.confirmPassword.isNotBlank() &&
@@ -223,26 +215,18 @@ fun SignupScreen(
 
             // Sign Up Button
             AppButton(
-                text = stringResource(R.string.sign_up),
-                onClick = {
-                    viewModel.signUp(
-                        onSuccess = { onSignUpSuccess() },
-                        onError = { error ->
-                            scope.launch {
-                                snackbarHostState.showSnackbar(
-                                    message = error,
-                                    withDismissAction = true
-                                )
-                            }
-                        }
-                    )
-                },
+                onClick = { viewModel.onSignUp() },
+                text = "Sign Up",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                enabled = viewModel.isFormValid && uiState !is SignupUiState.Loading,
-                isLoading = uiState is SignupUiState.Loading
+                    .padding(vertical = 16.dp),
+                enabled = viewModel.name.isNotBlank() &&
+                        viewModel.email.isNotBlank() &&
+                        viewModel.phone.isNotBlank() &&
+                        viewModel.password.isNotBlank() &&
+                        viewModel.password == viewModel.confirmPassword
             )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -260,17 +244,3 @@ fun SignupScreen(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun SignupScreenPreview() {
-    RetailerAppTheme(darkTheme = false, dynamicColor = false) {
-        Surface {
-            // Using hiltViewModel() will automatically provide a ViewModel for preview
-            // No need to pass the ViewModel parameter as it has a default value
-            SignupScreen(
-                onSignUpSuccess = {},
-                onLoginClick = {}
-            )
-        }
-    }
-}

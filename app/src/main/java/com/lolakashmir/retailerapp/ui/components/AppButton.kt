@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -16,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 /**
@@ -38,89 +42,60 @@ fun AppButton(
     variant: ButtonVariant = ButtonVariant.Primary,
     isLoading: Boolean = false,
     enabled: Boolean = true,
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    contentPadding: PaddingValues = PaddingValues(vertical = 12.dp),
     content: @Composable (RowScope.() -> Unit)? = null
 ) {
-    // Animation for loading state
-    val buttonElevation by animateDpAsState(if (isLoading) 0.dp else 4.dp)
-    val buttonShape = RoundedCornerShape(8.dp)
+    val buttonColors = when (variant) {
+        ButtonVariant.Primary -> ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+        )
+        ButtonVariant.Secondary -> ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+        )
 
-    // Define color quads for each button variant
-    val quad = when (variant) {
-        ButtonVariant.Primary -> {
-            val container = MaterialTheme.colorScheme.primary
-            val content = MaterialTheme.colorScheme.onPrimary
-            val disabledContainer = MaterialTheme.colorScheme.surfaceVariant
-            val disabledContent = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-            Quad(container, content, disabledContainer, disabledContent)
-        }
-        ButtonVariant.Secondary -> {
-            val container = MaterialTheme.colorScheme.secondaryContainer
-            val content = MaterialTheme.colorScheme.onSecondaryContainer
-            val disabledContainer = MaterialTheme.colorScheme.surfaceVariant
-            val disabledContent = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-            Quad(container, content, disabledContainer, disabledContent)
-        }
-        ButtonVariant.Outlined -> {
-            val container = Color.Transparent
-            val content = MaterialTheme.colorScheme.primary
-            val disabledContainer = container.copy(alpha = 0f)
-            val disabledContent = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-            Quad(container, content, disabledContainer, disabledContent)
-        }
+        ButtonVariant.Outlined -> ButtonDefaults.buttonColors(
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.primary,
+            disabledContainerColor = Color.Transparent,
+            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+        )
     }
 
-    // Animate color changes
-    val animatedContainerColor by animateColorAsState(
-        if (enabled) quad.container else quad.disabledContainer,
-        label = "buttonContainerColor"
-    )
-    val animatedContentColor by animateColorAsState(
-        if (enabled) quad.content else quad.disabledContent,
-        label = "buttonContentColor"
-    )
-
     Button(
-        onClick = { if (!isLoading) onClick() },
-        modifier = modifier,
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        colors = buttonColors,
         enabled = enabled && !isLoading,
-        shape = buttonShape,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = animatedContainerColor,
-            contentColor = animatedContentColor,
-            disabledContainerColor = quad.disabledContainer,
-            disabledContentColor = quad.disabledContent
-        ),
-        contentPadding = contentPadding,
+        shape = RoundedCornerShape(12.dp),
         elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = buttonElevation,
+            defaultElevation = 0.dp,
             pressedElevation = 2.dp,
             disabledElevation = 0.dp
         ),
-        border = if (variant == ButtonVariant.Outlined) {
-            BorderStroke(
-                width = 2.dp,
-                color = if (enabled) quad.content else quad.disabledContent
-            )
-        } else {
-            null
-        }
+        contentPadding = contentPadding
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                color = quad.content,
+                color = MaterialTheme.colorScheme.onPrimary,
                 strokeWidth = 2.dp,
-                modifier = Modifier.padding(end = 8.dp)
+                modifier = Modifier.size(24.dp)
             )
-        }
-
-        if (content != null) {
-            content()
         } else {
             Text(
-                text = if (isLoading) "Loading..." else text,
-                style = MaterialTheme.typography.labelLarge
+                text = text,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
+            content?.invoke(this)
         }
     }
 }
