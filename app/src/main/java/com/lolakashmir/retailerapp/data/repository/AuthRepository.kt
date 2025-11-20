@@ -2,58 +2,49 @@ package com.lolakashmir.retailerapp.data.repository
 
 import com.lolakashmir.retailerapp.data.api.ApiClient
 import com.lolakashmir.retailerapp.data.model.ApiResponse
+import com.lolakashmir.retailerapp.data.model.auth.LoginRequest
+import com.lolakashmir.retailerapp.data.model.auth.LoginResponse
 import com.lolakashmir.retailerapp.data.model.auth.SignupRequest
+import com.lolakashmir.retailerapp.data.model.auth.SignupResponse
 import javax.inject.Inject
+import javax.inject.Singleton
 
-/**
- * Repository class that handles data operations.
- * Acts as a single source of truth for data in the application.
- */
-open class AuthRepository @Inject constructor() {
-    private val authApiService = ApiClient.authApiService
+@Singleton
+open class AuthRepository @Inject constructor(
+    private val apiClient: ApiClient
+) {
+    /**
+     * Function to handle user signup
+     */
+    open suspend fun signUp(request: SignupRequest): ApiResponse<SignupResponse> {
+    return apiClient.safeApiCall {
+        apiClient.authApiService.signUp(request)
+    }
+}
 
     /**
-     * Example function to fetch data from an API endpoint
+     * Function to handle user login
      */
-//    suspend fun fetchData(param: String): ApiResponse<Any> {
-//        return ApiClient.safeApiCall {
-//            apiService.getData(param)
-//        }
-//    }
-
-    /**
-     * Function to post data(Signup) to an API endpoint
-     */
-    open suspend fun signUp(request: SignupRequest): ApiResponse<Any> {
-        return ApiClient.safeApiCall {
-            authApiService.signUp(request)
+    open suspend fun login(request: LoginRequest): ApiResponse<LoginResponse> {
+        return apiClient.safeApiCall {
+            apiClient.authApiService.login(request)
         }
     }
 
     /**
-     * Function to post data(Login) to an API endpoint
+     * Function to check if user is logged in
      */
-    open suspend fun login(email: String, password: String): ApiResponse<Any> {
-        return ApiClient.safeApiCall {
-            authApiService.login(email, password)
-        }
+//    fun isUserLoggedIn(): Boolean {
+//        return apiClient.getToken() != null
+//    }
+
+    /**
+     * Function to log out user
+     */
+//    fun logout() {
+//        apiClient.clearToken()
+//    }
+    open suspend fun signup(request: LoginRequest): ApiResponse<LoginResponse> {
+        TODO("Not yet implemented")
     }
-
-    /**
-     * Example function to update data
-     */
-//    suspend fun updateData(id: String, request: Any): ApiResponse<Any> {
-//        return ApiClient.safeApiCall {
-//            apiService.updateData(id, request)
-//        }
-//    }
-
-    /**
-     * Example function to delete data
-     */
-//    suspend fun deleteData(id: String): ApiResponse<BaseResponse<Unit>> {
-//        return ApiClient.safeApiCall {
-//            apiService.deleteData(id)
-//        }
-//    }
 }

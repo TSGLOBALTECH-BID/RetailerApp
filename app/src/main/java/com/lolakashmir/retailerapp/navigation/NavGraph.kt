@@ -46,7 +46,10 @@ fun NavGraph(
 
         composable(Screen.Login.route) {
             LoginScreen(
-                onLoginSuccess = { /* Navigate to home */ },
+                onLoginSuccess = { navController.navigate(Screen.Home.route) {
+                // Clear back stack to prevent going back to login
+                popUpTo(Screen.Login.route) { inclusive = true }
+            } },
                 onNavigateToSignup = { navController.navigate(Screen.SignUp.route) }
             )
         }

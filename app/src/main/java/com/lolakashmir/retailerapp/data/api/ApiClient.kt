@@ -1,16 +1,25 @@
 package com.lolakashmir.retailerapp.data.api
 
-import com.google.gson.Gson
+import com.lolakashmir.retailerapp.data.manager.TokenManager
 import com.lolakashmir.retailerapp.data.model.ApiResponse
+import com.lolakashmir.retailerapp.data.model.BaseResponse
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
+import javax.inject.Singleton
 
-object ApiClient {
-    private const val BASE_URL = "http://10.0.2.2:3000/api/" //"https://ecommerce-api-one-gamma.vercel.app/api/" // Replace with your API base URL
+@Singleton
+class ApiClient @Inject constructor(
+   private val tokenManager: TokenManager) {
+
+
+    private val BASE_URL = "http://10.0.2.2:3000/api/" //"https://ecommerce-api-one-gamma.vercel.app/api/" // Replace with your API base URL
     private var retrofit: Retrofit? = null
 
     // Create OkHttpClient with logging interceptor
@@ -19,8 +28,22 @@ object ApiClient {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
+        val authInterceptor = Interceptor { chain ->
+            val original = chain.request()
+            val requestBuilder = original.newBuilder()
+
+            // Get token from TokenManager
+            tokenManager.getToken()?.let { token ->
+                requestBuilder.addHeader("Authorization", "Bearer $token")
+            }
+
+            requestBuilder.method(original.method, original.body)
+            chain.proceed(requestBuilder.build())
+        }
+
         OkHttpClient.Builder()
             .addInterceptor(logging)
+            .addInterceptor(authInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
@@ -48,28 +71,24 @@ object ApiClient {
     /**
      * Handles API calls and wraps the response in ApiResponse
      */
-    suspend fun <T> safeApiCall(apiCall: suspend () -> retrofit2.Response<T>): ApiResponse<T> {
-        return try {
-            val response = apiCall()
-            
-            if (response.isSuccessful) {
-                response.body()?.let { data ->
-                    ApiResponse.Success(data)
-                } ?: ApiResponse.Error("Response body is null")
-            } else {
-                val errorBody = response.errorBody()?.string()
-                val errorMsg = try {
-                    // Try to parse error message from error body
-                    Gson().fromJson(errorBody, Map::class.java)?.get("message")?.toString()
-                        ?: "Unknown error occurred"
-                } catch (e: Exception) {
-                    "Error: ${response.code()} - ${response.message()}"
+   suspend fun <T> safeApiCall(apiCall: suspend () -> Response<BaseResponse<T>>): ApiResponse<T> {
+    return try {
+        val response = apiCall()
+        if (response.isSuccessful) {
+            response.body()?.let { baseResponse ->
+                if (baseResponse.success) {
+                    baseResponse.data?.let { data ->
+                        ApiResponse.Success(data)
+                    } ?: ApiResponse.Error("No data in response")
+                } else {
+                    ApiResponse.Error(baseResponse.message ?: "Request failed")
                 }
-                ApiResponse.Error(errorMsg, response.code())
-            }
-        } catch (e: Exception) {
-            // Handle network errors
-            ApiResponse.Error(e.message ?: "Network error occurred")
+            } ?: ApiResponse.Error("Response body is null")
+        } else {
+            ApiResponse.Error("Network error: ${response.code()}")
         }
+    } catch (e: Exception) {
+        ApiResponse.Error(e.message ?: "Unknown error occurred")
     }
+}
 }
