@@ -1,14 +1,19 @@
 package com.lolakashmir.retailerapp.navigation
 
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 
+import com.lolakashmir.retailerapp.ui.components.AppDrawer
 import com.lolakashmir.retailerapp.ui.screens.home.HomeScreen
 import com.lolakashmir.retailerapp.ui.screens.signup.SignupScreen
 import com.lolakashmir.retailerapp.ui.screens.login.LoginScreen
+import kotlinx.coroutines.launch
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")
@@ -19,18 +24,28 @@ sealed class Screen(val route: String) {
 @Composable
 fun NavGraph(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = Screen.Home.route
+    startDestination: String = Screen.Login.route
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
         composable(Screen.Home.route) {
-            HomeScreen(
-                onSignUpClick = {
-                    navController.navigate(Screen.SignUp.route)
+            val drawerState = rememberDrawerState(DrawerValue.Closed)
+            val scope = rememberCoroutineScope()
+
+            AppDrawer(
+            drawerState = drawerState,
+            drawerContent = {
+            // Your drawer content
+            }
+            ) {
+                HomeScreen(
+                onMenuClick = {
+                scope.launch { drawerState.open() }
                 }
-            )
+                )
+            }
         }
         
         composable(Screen.SignUp.route) {
